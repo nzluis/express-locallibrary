@@ -1,0 +1,13 @@
+<% layout('layout') -%>
+<h1><%= title %></h1>
+
+<ul>
+    <% genre_list.forEach(genre => { %>
+        <li>
+            <a href="<%= genre.url %>"><%= genre.name %></a>
+        </li>
+    <% }) %>
+    <% if (genre_list == 0) { %>    
+        <li>There are no genres</li>
+    <% } %>
+</ul>
