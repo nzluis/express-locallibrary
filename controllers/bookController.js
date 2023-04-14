@@ -4,7 +4,6 @@ const Genre = require("../models/genre");
 const BookInstance = require("../models/bookinstance");
 const { body, validationResult } = require("express-validator");
 
-
 const async = require("async");
 
 exports.index = (req, res) => {
@@ -50,7 +49,6 @@ exports.book_list = function (req, res, next) {
     });
 };
 
-
 // Display detail page for a specific book.
 exports.book_detail = (req, res, next) => {
   async.parallel(
@@ -85,7 +83,6 @@ exports.book_detail = (req, res, next) => {
   );
 };
 
-
 // Display book create form on GET.
 exports.book_create_get = (req, res, next) => {
   // Get all authors and genres, which we can use for adding to our book.
@@ -102,7 +99,7 @@ exports.book_create_get = (req, res, next) => {
       if (err) {
         return next(err);
       }
-      const {book} = ''
+      const { book } = "";
       res.render("book_form", {
         title: "Create Book",
         book,
@@ -112,7 +109,6 @@ exports.book_create_get = (req, res, next) => {
     }
   );
 };
-
 
 // Handle book create on POST.
 // Handle book create on POST.
@@ -203,15 +199,66 @@ exports.book_create_post = [
   },
 ];
 
-
 // Display book delete form on GET.
-exports.book_delete_get = (req, res) => {
-  res.send("NOT IMPLEMENTED: Book delete GET");
+exports.book_delete_get = (req, res, next) => {
+  async.parallel(
+    {
+      book(callback) {
+        Book.findById(req.params.id).populate("author").exec(callback);
+      },
+      bookinstance(callback) {
+        BookInstance.find({ book: req.params.id }).exec(callback);
+      },
+    },
+    (err, results) => {
+      if (err) {
+        return next(err);
+      }
+      if (results.book == null) {
+        // No results.
+        res.redirect("/catalog/books");
+      }
+      // Successful, so render.
+      res.render("book_delete", {
+        title: "Delete Book",
+        book: results.book,
+        bookinstance: results.bookinstance,
+      });
+    }
+  );
 };
 
 // Handle book delete on POST.
-exports.book_delete_post = (req, res) => {
-  res.send("NOT IMPLEMENTED: Book delete POST");
+exports.book_delete_post = (req, res, next) => {
+  async.parallel(
+    {
+      book(callback) {
+        Book.findById(req.body.bookid).exec(callback);
+      },
+      bookinstance(callback) {
+        BookInstance.find({ book: req.body.bookid }).exec(callback);
+      },
+    },
+    (err, results) => {
+      if (err) {
+        return next(err);
+      }
+      if (results.bookinstance.length > 0) {
+        res.render("book_delete", {
+          title: "Delete Book",
+          book: results.book,
+          bookinstance: results.bookinstance,
+        });
+        return;
+      }
+      Book.findByIdAndRemove(req.body.bookid, (err) => {
+        if (err) {
+          return next(err);
+        }
+        res.redirect("/catalog/books");
+      });
+    }
+  );
 };
 
 // Display book update form on GET.
@@ -249,7 +296,7 @@ exports.book_update_get = (req, res, next) => {
           if (genre._id.toString() === bookGenre._id.toString()) {
             genre.checked = true;
           } else {
-            genre.checked = false
+            genre.checked = false;
           }
         }
       }
@@ -325,7 +372,7 @@ exports.book_update_post = [
 
           // Mark our selected genres as checked.
           for (const genre of results.genres) {
-            if (book.genre.includes(genre._id)) {
+            if (book.genre.includes(genre.name)) {
               genre.checked = "true";
             }
           }
@@ -352,4 +399,3 @@ exports.book_update_post = [
     });
   },
 ];
-
