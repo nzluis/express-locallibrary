@@ -21,10 +21,9 @@ const mongoose = require("mongoose");
 mongoose.set('strictQuery', false);
 const mongoDB = process.env.MONGODB_URI ;
 
-main().catch(err => console.log(err));
-async function main() {
-  await mongoose.connect(mongoDB);
-}
+mongoose.connect(mongoDB, { useUnifiedTopology: true, useNewUrlParser: true })
+const db = mongoose.connection
+db.on("error", console.error.bind(console, "mongo connection error"))
 
 
 // view engine setup
