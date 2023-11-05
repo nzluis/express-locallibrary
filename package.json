@@ -13,6 +13,7 @@
     "compression": "^1.7.4",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
+    "dotenv": "^16.3.1",
     "ejs": "~2.6.1",
     "ejs-blocks": "^0.1.4",
     "express": "~4.16.1",

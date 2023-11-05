@@ -10,6 +10,7 @@ var usersRouter = require('./routes/users');
 const catalogRouter = require("./routes/catalog"); //Import routes for "catalog" area of site
 const compression = require("compression");
 const helmet = require("helmet");
+require('dotenv').config()
 
 var app = express();
 
@@ -18,9 +19,7 @@ app.use(helmet());
 // Set up mongoose connection
 const mongoose = require("mongoose");
 mongoose.set('strictQuery', false);
-const dev_db_url =
-  "mongodb+srv://luisnavarrofs:Stphm4tCGnTSBtqh@cluster0.i2iw6nt.mongodb.net/localLibrary?retryWrites=true&w=majority";
-const mongoDB = process.env.MONGODB_URI || dev_db_url;
+const mongoDB = process.env.MONGODB_URI ;
 
 main().catch(err => console.log(err));
 async function main() {
